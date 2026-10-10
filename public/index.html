@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SOC Console · pentesttask</title>
+  <link rel="stylesheet" href="app.css" />
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <div id="view-login" class="login-view hidden">
+    <div class="login-card">
+      <div class="brand login-brand">
+        <div class="brand-mark"><span class="bm-dot"></span></div>
+        <div>
+          <div class="brand-name">PENTESTTASK</div>
+          <div class="brand-sub">Security Operations Console</div>
+        </div>
+      </div>
+      <label for="username">Operator</label>
+      <input id="username" autocomplete="username" spellcheck="false" />
+      <label for="password">Password</label>
+      <input id="password" type="password" autocomplete="current-password" />
+      <div class="err" id="msg" role="alert"></div>
+      <button class="btn btn-primary btn-block" id="btn-login">Authenticate</button>
+      <p class="hint">Akses autentikasi gabungan (password) dengan rate-limit 5 percobaan / 5 menit.</p>
+    </div>
+  </div>
+
+  <!-- APP SHELL -->
+  <div id="app" class="app hidden">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark"><span class="bm-dot"></span></div>
+        <div>
+          <div class="brand-name">PENTESTTASK</div>
+          <div class="brand-sub">Security Operations</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="#overview" class="nav-item" data-view="overview">
+          <svg viewBox="0 0 16 16"><rect x="1.5" y="1.5" width="5.2" height="5.2"/><rect x="9.3" y="1.5" width="5.2" height="5.2"/><rect x="1.5" y="9.3" width="5.2" height="5.2"/><rect x="9.3" y="9.3" width="5.2" height="5.2"/></svg>
+          <span>Overview</span>
+        </a>
+        <a href="#infrastructure" class="nav-item" data-view="infrastructure">
+          <svg viewBox="0 0 16 16"><path d="M1.5 8h3l1.5-4 2.5 8 2-6 1 2h3"/></svg>
+          <span>Infrastructure</span>
+        </a>
+        <a href="#security" class="nav-item" data-view="security">
+          <svg viewBox="0 0 16 16"><path d="M8 1.5 3 3.5v4c0 3.2 2.2 5.9 5 7 2.8-1.1 5-3.8 5-7v-4z"/><path d="M6 8l1.5 1.5L10.5 6.5"/></svg>
+          <span>Security Events</span>
+        </a>
+        <a href="#network" class="nav-item" data-view="network">
+          <svg viewBox="0 0 16 16"><circle cx="3.5" cy="12.5" r="2"/><circle cx="12.5" cy="5.5" r="2"/><circle cx="12.5" cy="12.5" r="2"/><path d="M5 11l4-4M11 8V5.5"/></svg>
+          <span>Network &amp; Zero Trust</span>
+        </a>
+        <a href="#processes" class="nav-item" data-view="processes">
+          <svg viewBox="0 0 16 16"><rect x="1.5" y="1.5" width="5" height="5"/><rect x="9.5" y="1.5" width="5" height="5"/><rect x="1.5" y="9.5" width="5" height="5"/><rect x="9.5" y="9.5" width="5" height="5"/></svg>
+          <span>Processes &amp; Connections</span>
+        </a>
+        <a href="#audit" class="nav-item" data-view="audit">
+          <svg viewBox="0 0 16 16"><path d="M3 1.5h8l2 2v11H3z"/><path d="M11.5 1.5v3h2M5.5 7h5M5.5 10h5"/></svg>
+          <span>Audit Logs</span>
+        </a>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="status-line"><span class="dot" id="dot-vpn"></span> ZT mesh <span id="stat-vpn" class="stat">…</span></div>
+        <div class="status-line"><span class="dot" id="dot-soc"></span> SOC <span id="stat-soc" class="stat">…</span></div>
+        <div class="status-line"><span class="dot" id="dot-wazuh"></span> Wazuh agent <span id="stat-wazuh" class="stat">…</span></div>
+      </div>
+      <div class="sidebar-env" id="envchip">PROD</div>
+    </aside>
+
+    <div class="main">
+      <header class="topbar">
+        <div class="tb-left">
+          <button class="icon-btn" id="btn-menu" title="Menu"><svg viewBox="0 0 16 16"><path d="M2 4h12M2 8h12M2 12h12"/></svg></button>
+          <div class="crumb"><span id="crumb">Overview</span><span class="crumb-sub">/ live view</span></div>
+        </div>
+        <div class="tb-right">
+          <span class="ctl" id="fresh" title="Kesegaran data">—</span>
+          <span class="ctl clock" id="clock">--:--:--</span>
+          <span class="probe" id="probe" title="HTTP freshness probe">—</span>
+          <button class="icon-btn" id="btn-logout" title="Keluar"><svg viewBox="0 0 16 16"><path d="M6 2H3v12h3M10 5l3 3-3 3M13 8H6"/></svg></button>
+        </div>
+      </header>
+
+      <div id="banner" class="banner hidden"></div>
+
+      <main class="content" id="content"></main>
+    </div>
+  </div>
+
+  <!-- INCIDENT / DETAIL MODAL -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-scrim"></div>
+    <div class="modal-card" id="modalCard"></div>
+  </div>
+
+  <div id="loading" class="boot-loading">Initializing console…</div>
+
+  <script src="app.js"></script>
+</body>
+</html>

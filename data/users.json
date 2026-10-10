@@ -1,0 +1,10 @@
+{
+  "admin": {
+    "username": "admin",
+    "salt": "YAWkrCjG8AOp5xBkoYAWfw",
+    "hash": "1162e94965aba9b2ccb02116b081e59f211ddad8bc84e70288798588fc799f30a77361abf1af443fd84cfb4a7be23033e8079b60b33bdaf76d03bf5db50b1f11",
+    "totpSecret": "GBFESPDPGVFHIWDVJI2FCUDOJNKH2VJ7",
+    "totpVerified": true,
+    "createdAt": "2026-10-10T03:51:11.867Z"
+  }
+}
