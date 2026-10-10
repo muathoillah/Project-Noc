@@ -1,0 +1,3 @@
+data/INITIAL_CREDENTIALS.txt
+*.env
+credentials*
