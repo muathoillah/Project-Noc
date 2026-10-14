@@ -1,136 +1,132 @@
 # Project-Noc
 
-Project-Noc adalah dashboard operasional dan keamanan (SOC / NOC) yang berjalan di server lokal untuk memantau kondisi infrastruktur, layanan sistem, lalu lintas jaringan, dan kejadian keamanan. Aplikasi ini dibuat dengan Node.js + Express dan menampilkan data secara real-time dari sistem operasi seperti `systemctl`, `ss`, `journalctl`, `df`, dan `netstat`-style command yang umum tersedia di Linux.
+Project-Noc is a Security Operations Center (SOC) / Network Operations Center (NOC) dashboard that runs on a local server to monitor infrastructure, system services, network traffic, and security events. Built with Node.js and Express, it displays real-time data collected from common Linux utilities such as `systemctl`, `ss`, `journalctl`, and `df`.
 
-## Fitur utama
+## Key features
 
-- Monitoring sistem: CPU load, memori, penggunaan disk, uptime, dan kernel
-- Status layanan: `systemctl is-active` untuk layanan seperti nginx, MySQL, PHP-FPM, ZeroTier, Wazuh, dan layanan internal
-- Pemeriksaan HTTP/TCP: mengecek endpoint penting dan port terbuka
-- Keamanan: event SSH seperti login berhasil, gagal, invalid user, dan brute-force attempt
-- Firewall & keamanan jaringan: UFW block history, koneksi jaringan, listener socket, serta peer ZeroTier
-- Audit logs: event service starts/stops, sudo activity, dan event sshd
-- Dashboard antarmuka web: tampilan overview, infrastructure, security events, network, processes, audit
-- Autentikasi: login password dengan rate limiting 5 percobaan per 5 menit
+- System monitoring: CPU load, memory, disk usage, uptime, and kernel information
+- Service status: `systemctl is-active` checks for services such as Nginx, MySQL, PHP-FPM, ZeroTier, Wazuh, and internal services
+- HTTP/TCP checks: probes important endpoints and open ports
+- Security monitoring: SSH events such as successful and failed logins, invalid users, and brute-force attempts
+- Firewall and network security: UFW block history, network connections, socket listeners, and ZeroTier peers
+- Audit logs: service start/stop events, sudo activity, and sshd events
+- Web dashboard: Overview, Infrastructure, Security Events, Network, Processes, and Audit views
+- Authentication: password login with a limit of 5 attempts per 5 minutes
 
-## Arsitektur aplikasi
+## Application architecture
 
 ```text
 Project-Noc/
 ├── data/
-│   ├── metrics.json                 # Telemetry untuk grafik; dibuat/diperbarui aplikasi
-│   ├── users.json                   # User, hash password, dan secret TOTP
-│   └── INITIAL_CREDENTIALS.txt      # Kredensial bootstrap; dibuat saat pertama dijalankan
+│   ├── metrics.json                 # Chart telemetry; created and updated by the application
+│   ├── users.json                   # Users, password hashes, and TOTP secrets
+│   └── INITIAL_CREDENTIALS.txt      # Bootstrap credentials; created on first run
 ├── docs/
-│   └── screenshots/                 # Screenshot dokumentasi dashboard
+│   └── screenshots/                 # Dashboard documentation screenshots
 ├── public/
-│   ├── app.css                      # Styling dashboard
-│   ├── app.js                       # Pengambilan data, state, navigasi, dan rendering UI
-│   └── index.html                   # Struktur halaman dan shell dashboard
+│   ├── app.css                      # Dashboard styles
+│   ├── app.js                       # Data fetching, state, navigation, and UI rendering
+│   └── index.html                   # Dashboard page structure and shell
 ├── .gitignore
 ├── LICENSE
 ├── package.json
 ├── README.md
-└── server.js                        # Backend Express, autentikasi, collector, dan API
+└── server.js                        # Express backend, authentication, collectors, and API
 ```
 
-Folder `data/` menyimpan data runtime. `users.json` dan `INITIAL_CREDENTIALS.txt` dapat berisi informasi sensitif; jangan unggah data produksi ke repository publik. Folder `docs/screenshots/` disediakan untuk gambar dokumentasi yang aman dibagikan.
+The `data/` directory stores runtime data. `users.json` and `INITIAL_CREDENTIALS.txt` may contain sensitive information; do not upload production data to a public repository. The `docs/screenshots/` directory is intended for dashboard documentation images.
 
-## Screenshot
+## Screenshots
 
-Screenshot antarmuka disimpan di `docs/screenshots/`. Galeri berikut disusun dari ringkasan umum ke halaman operasional yang lebih spesifik:
+Interface screenshots are stored in `docs/screenshots/`. The gallery below is arranged from the general overview to more specific operational views:
 
 <table>
   <tr>
     <td width="50%">
-      <img src="docs/screenshots/overview%20dasboard.png" alt="Halaman Overview" width="100%">
-      <p><strong>Overview</strong><br>Ringkasan kesehatan host, metrik sistem, layanan, dan aktivitas keamanan.</p>
+      <img src="docs/screenshots/overview%20dasboard.png" alt="Overview page" width="100%">
+      <p><strong>Overview</strong><br>Summary of host health, system metrics, services, and security activity.</p>
     </td>
     <td width="50%">
-      <img src="docs/screenshots/infra%20dashboard.png" alt="Halaman Infrastructure" width="100%">
-      <p><strong>Infrastructure</strong><br>Tren resource, penggunaan filesystem, traffic interface, dan status layanan.</p>
-    </td>
-  </tr>
-  <tr>
-    <td width="50%">
-      <img src="docs/screenshots/apps%20runing%20in%20infra.png" alt="Daftar aplikasi dan layanan pada halaman Infrastructure" width="100%">
-      <p><strong>Aplikasi dan layanan</strong><br>Cuplikan status unit layanan yang dipantau di bagian Infrastructure.</p>
-    </td>
-    <td width="50%">
-      <img src="docs/screenshots/security%20event.png" alt="Halaman Security Events" width="100%">
-      <p><strong>Security Events</strong><br>Ringkasan event SSH, distribusi severity, dan status agent Wazuh.</p>
+      <img src="docs/screenshots/infra%20dashboard.png" alt="Infrastructure page" width="100%">
+      <p><strong>Infrastructure</strong><br>Resource trends, filesystem usage, interface traffic, and service status.</p>
     </td>
   </tr>
   <tr>
     <td width="50%">
-      <img src="docs/screenshots/zerotrust%20network%20monitoring.png" alt="Halaman Network dan Zero Trust" width="100%">
-      <p><strong>Network &amp; Zero Trust</strong><br>Topologi ZeroTier, peer, dan socket listener berdasarkan exposure.</p>
+      <img src="docs/screenshots/apps%20runing%20in%20infra.png" alt="Applications and services on the Infrastructure page" width="100%">
+      <p><strong>Applications and services</strong><br>Service unit statuses monitored in the Infrastructure view.</p>
     </td>
     <td width="50%">
-      <img src="docs/screenshots/conetion%20server.png" alt="Halaman Processes dan Connections" width="100%">
-      <p><strong>Processes &amp; Connections</strong><br>Daftar koneksi TCP/UDP beserta state, alamat lokal/remote, dan proses.</p>
+      <img src="docs/screenshots/security%20event.png" alt="Security Events page" width="100%">
+      <p><strong>Security Events</strong><br>Summary of SSH events, severity distribution, and Wazuh agent status.</p>
     </td>
   </tr>
   <tr>
     <td width="50%">
-      <img src="docs/screenshots/trhread.png" alt="Halaman Threat Map" width="100%">
-      <p><strong>Threat Map</strong><br>Peta sumber event keamanan dan ringkasan threat-intelligence yang tampak pada screenshot.</p>
+      <img src="docs/screenshots/zerotrust%20network%20monitoring.png" alt="Network and Zero Trust page" width="100%">
+      <p><strong>Network &amp; Zero Trust</strong><br>ZeroTier topology, peers, and socket listeners categorized by exposure.</p>
     </td>
     <td width="50%">
-      <img src="docs/screenshots/audit%20log%20server.png" alt="Halaman Audit Logs" width="100%">
-      <p><strong>Audit Logs</strong><br>Aktivitas sudo, perubahan layanan systemd, dan siklus hidup sshd.</p>
+      <img src="docs/screenshots/conetion%20server.png" alt="Processes and Connections page" width="100%">
+      <p><strong>Processes &amp; Connections</strong><br>TCP/UDP connections with their state, local and remote addresses, and process.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="docs/screenshots/trhread.png" alt="Threat Map page" width="100%">
+      <p><strong>Threat Map</strong><br>Map of security event sources and the threat intelligence summary shown in the screenshot.</p>
+    </td>
+    <td width="50%">
+      <img src="docs/screenshots/audit%20log%20server.png" alt="Audit Logs page" width="100%">
+      <p><strong>Audit Logs</strong><br>sudo activity, systemd service changes, and sshd lifecycle events.</p>
     </td>
   </tr>
 </table>
 
-> **Privasi:** beberapa screenshot memperlihatkan hostname/domain, alamat IP, username, serta isi audit log. Samarkan informasi tersebut sebelum mempublikasikan repository atau membagikan gambar ke pihak lain. Jangan sertakan password, token, atau secret.
+## Backend and display flow
 
-> **Kesesuaian versi:** screenshot mendokumentasikan tampilan yang ada pada gambar. Contohnya, screenshot Threat Map memperlihatkan halaman yang tidak tercantum di daftar view pada frontend repository saat ini; pastikan implementasi dan screenshot sudah sesuai sebelum menganggap semua halaman tersedia pada versi kode ini.
-
-## Alur backend dan tampilan
-
-Diagram berikut merangkum jalur utama data dari browser ke server dan kembali ke komponen dashboard:
+The following diagram summarizes how data flows from the browser to the server and back to the dashboard:
 
 ```mermaid
 flowchart TD
-    A[Browser membuka aplikasi] --> B[Express menyajikan public/index.html, app.js, dan app.css]
-    B --> C[Frontend meminta GET /api/session]
-    C --> D{Cookie session valid?}
-    D -- Tidak --> E[Tampilkan halaman login]
-    E --> F[POST /api/login dengan username dan password]
-    F --> G[Backend memeriksa hash password dan rate limit]
-    G -- Berhasil --> H[Set cookie session HttpOnly]
-    G -- Gagal --> E
-    D -- Ya --> I[Tampilkan dashboard]
+    A[Browser opens the application] --> B[Express serves public/index.html, app.js, and app.css]
+    B --> C[Frontend requests GET /api/session]
+    C --> D{Is the session cookie valid?}
+    D -- No --> E[Display the login page]
+    E --> F[POST /api/login with username and password]
+    F --> G[Backend checks the password hash and rate limit]
+    G -- Success --> H[Set HttpOnly session cookie]
+    G -- Failure --> E
+    D -- Yes --> I[Display the dashboard]
     H --> I
-    I --> J[Frontend meminta GET /api/noc setiap 3 detik]
-    J --> K[Backend memvalidasi cookie melalui middleware auth]
-    K --> L[Collector membaca metrik sistem, service, network, security, dan audit]
-    L --> M[Backend menggabungkan hasil menjadi JSON]
-    M --> N[Frontend menyimpan data ke state]
-    N --> O[Render atau perbarui view aktif]
+    I --> J[Frontend requests GET /api/noc every 3 seconds]
+    J --> K[Backend validates the cookie through auth middleware]
+    K --> L[Collectors read system, service, network, security, and audit data]
+    L --> M[Backend combines results into JSON]
+    M --> N[Frontend stores the data in state]
+    N --> O[Render or update the active view]
     O --> J
-    K -- Session tidak valid --> E
-    L -- Gagal / data tidak tersedia --> P[Tampilkan indikator data stale; pertahankan data valid terakhir]
+    K -- Invalid session --> E
+    L -- Failure / data unavailable --> P[Show stale-data indicator and retain the last valid data]
     P --> J
 ```
 
-Rincian proses:
+Process details:
 
-1. Express menyajikan file statis dari `public/`.
-2. Saat inisialisasi, frontend memeriksa session melalui `GET /api/session`. Jika belum terautentikasi, halaman login ditampilkan.
-3. Login frontend mengirim username dan password ke `POST /api/login`. Jika valid, backend mengirim cookie session. Percobaan gagal dibatasi menjadi 5 kali sebelum IP dikunci selama 5 menit.
-4. Setelah login, frontend memanggil `GET /api/noc` segera, lalu mengulang permintaan setiap 3 detik. Endpoint ini dilindungi middleware autentikasi.
-5. Backend mengumpulkan data dari sistem operasi dan layanan yang dikonfigurasi, membaca telemetry historis, menghitung status kesehatan, lalu mengirim satu respons JSON.
-6. Frontend menyimpan respons tersebut di state, memperbarui indikator header, lalu memilih renderer sesuai view aktif: Overview, Infrastructure, Security Events, Network, Processes, atau Audit.
-7. Jika pengambilan data gagal, dashboard mempertahankan data valid terakhir dan menampilkan indikator bahwa feed sedang stale. Jika server membalas `401`, frontend kembali ke halaman login.
+1. Express serves static files from `public/`.
+2. On initialization, the frontend checks the session through `GET /api/session`. If the user is not authenticated, the login page is displayed.
+3. The frontend sends the username and password to `POST /api/login`. If they are valid, the backend sends a session cookie. Failed attempts are limited to 5 before the IP address is locked for 5 minutes.
+4. After login, the frontend immediately calls `GET /api/noc` and then repeats the request every 3 seconds. This endpoint is protected by authentication middleware.
+5. The backend collects data from the operating system and configured services, reads historical telemetry, calculates health status, and returns a single JSON response.
+6. The frontend stores the response in state, updates the header indicators, and selects a renderer for the active view: Overview, Infrastructure, Security Events, Network, Processes, or Audit.
+7. If data retrieval fails, the dashboard keeps the last valid data and displays a stale-feed indicator. If the server responds with `401`, the frontend returns to the login page.
 
-> Catatan implementasi: backend menyediakan endpoint `POST /api/2fa/verify`, tetapi alur login pada frontend saat ini hanya memanggil `POST /api/login`; UI belum meminta atau mengirim kode TOTP.
+> Implementation note: the backend provides a `POST /api/2fa/verify` endpoint, but the current frontend login flow only calls `POST /api/login`; the UI does not request or submit a TOTP code.
 
-## Persyaratan
+## Requirements
 
-- Node.js LTS (direkomendasikan v18 atau lebih tinggi)
-- Sistem Linux yang memiliki command berikut:
+- Node.js LTS (version 18 or later recommended)
+- A Linux system with the following utilities:
   - `systemctl`
   - `curl`
   - `ss`
@@ -139,38 +135,38 @@ Rincian proses:
   - `nproc`
   - `uname`
   - `cat /proc/...`
-- Akses root atau minimal akses ke service dan log sistem yang ingin dimonitor
+- Root access, or at least sufficient access to the services and system logs being monitored
 
-## Cara install
+## Installation
 
-1. Clone repository:
+1. Clone the repository:
 
    ```bash
    git clone https://github.com/muathoillah/Project-Noc.git
    cd Project-Noc
    ```
 
-2. Install dependency:
+2. Install dependencies:
 
    ```bash
    npm install
    ```
 
-3. Jalankan aplikasi:
+3. Start the application:
 
    ```bash
    node server.js
    ```
 
-4. Aplikasi akan berjalan di:
+4. The application will be available at:
 
    ```text
    http://127.0.0.1:4000
    ```
 
-## Konfigurasi lingkungan
+## Environment configuration
 
-Aplikasi mendukung variabel environment berikut:
+The application supports the following environment variables:
 
 ```bash
 export PORT=4000
@@ -180,67 +176,67 @@ export NOC_SESSION_KEY=custom-session-key
 node server.js
 ```
 
-Catatan:
-- Jika `NOC_USER` dan `NOC_PASSWORD` tidak di-set, aplikasi akan membuat user admin secara otomatis dengan password acak.
-- Password awal akan dicetak ke terminal dan disimpan di `data/INITIAL_CREDENTIALS.txt`.
-- `NOC_SESSION_KEY` digunakan untuk menandatangani session cookie.
+Notes:
+- If `NOC_USER` and `NOC_PASSWORD` are not set, the application automatically creates an admin user with a random password.
+- The initial password is printed to the terminal and saved in `data/INITIAL_CREDENTIALS.txt`.
+- `NOC_SESSION_KEY` is used to sign the session cookie.
 
-## Login dan autentikasi
+## Login and authentication
 
-Saat pertama kali dijalankan, aplikasi akan membuat user admin dan TOTP secret baru jika belum ada user. Informasi bootstrap ditulis ke terminal dan file `data/INITIAL_CREDENTIALS.txt`.
+On first run, if no users exist, the application creates an admin user and a new TOTP secret. Bootstrap details are written to the terminal and to `data/INITIAL_CREDENTIALS.txt`.
 
-Contoh isi kredensial:
+Example credentials file:
 
 ```text
 SOC / NOC Dashboard - initial credentials
 URL      : https://noc.muthisyah.my.id
 Username : admin
-Password : <password-acak>
+Password : <random-password>
 Secret   : <totp-secret>
 ```
 
-Pada alur UI saat ini, login dilakukan dengan username dan password. Backend juga memiliki endpoint verifikasi TOTP, tetapi belum terhubung ke form login frontend. Aplikasi menerapkan rate limiting:
+The current UI login flow uses a username and password. The backend also has a TOTP verification endpoint, but it is not connected to the frontend login form. The application applies rate limiting:
 
-- Maksimal 5 percobaan login per IP
-- Lockout selama 5 menit jika melebihi batas
+- A maximum of 5 login attempts per IP address
+- A 5-minute lockout after the limit is exceeded
 
-## Endpoint API utama
+## Main API endpoints
 
-Semua endpoint API utama memerlukan autentikasi cookie session kecuali endpoint login.
+`GET /api/session`, `POST /api/login`, and `POST /api/2fa/verify` do not require an existing session cookie. `POST /api/logout` and `GET /api/noc` do require session-cookie authentication.
 
 ### `GET /api/session`
-Mengembalikan status autentikasi session saat ini.
+Returns the current session authentication status.
 
 ### `POST /api/login`
-Login awal dengan username dan password.
+Authenticates with a username and password.
 
 Request body:
 
 ```json
 {
   "username": "admin",
-  "password": "password-anda"
+  "password": "your-password"
 }
 ```
 
 ### `POST /api/2fa/verify`
-Endpoint backend untuk verifikasi kode TOTP. Endpoint ini tersedia di server, tetapi belum dipanggil oleh UI saat ini.
+Backend endpoint for verifying a TOTP code. This endpoint is available on the server but is not currently called by the UI.
 
 Request body:
 
 ```json
 {
   "username": "admin",
-  "password": "password-anda",
+  "password": "your-password",
   "code": "123456"
 }
 ```
 
 ### `POST /api/logout`
-Logout pengguna aktif.
+Logs out the current user.
 
 ### `GET /api/noc`
-Mengambil payload dashboard yang berisi:
+Returns a dashboard payload containing:
 
 - `system`
 - `disk`
@@ -253,13 +249,13 @@ Mengambil payload dashboard yang berisi:
 - `metrics`
 - `health`
 
-## Struktur data
+## Data files
 
 ### `data/users.json`
-Berisi user terdaftar, hash password, salt, secret TOTP, dan flag `totpVerified`.
+Contains registered users, password hashes, salts, TOTP secrets, and the `totpVerified` flag.
 
 ### `data/metrics.json`
-Menampung serial metric historis seperti:
+Stores a series of historical metrics, such as:
 
 ```json
 [
@@ -275,91 +271,91 @@ Menampung serial metric historis seperti:
 ```
 
 ### `data/INITIAL_CREDENTIALS.txt`
-File ini berisi kredensial awal yang dibuat otomatis ketika user belum ada. Biasanya dipakai sebagai backup saat bootstrapping server tanpa akses interaktif.
+This file contains the initial credentials created automatically when no users exist. It can be used during server bootstrapping when interactive access is unavailable.
 
-## Fitur dashboard
+## Dashboard views
 
 ### Overview
-Menampilkan ringkasan kesehatan, uptime, status server, dan indikator kondisi sistem.
+Displays a summary of health, uptime, server status, and system condition indicators.
 
 ### Infrastructure
-Menampilkan:
-- status CPU, RAM, swap
-- penggunaan disk per mount point
-- service health
-- HTTP/TCP probing
+Displays:
+- CPU, memory, and swap status
+- Disk usage by mount point
+- Service health
+- HTTP/TCP probes
 
 ### Security Events
-Menampilkan log SSH dan indikator keamanan seperti:
-- accepted login
-- failed password
-- invalid user
-- max authentication attempts
+Displays SSH logs and security indicators such as:
+- Accepted logins
+- Failed passwords
+- Invalid users
+- Maximum authentication attempts
 
 ### Network & Zero Trust
-Menampilkan:
-- traffic interface network
-- state peer ZeroTier
-- listener TCP/UDP
-- informasi jaringan dan peer
+Displays:
+- Network interface traffic
+- ZeroTier peer status
+- TCP/UDP listeners
+- Network and peer information
 
 ### Processes & Connections
-Menampilkan daftar koneksi aktif, port yang dibuka, serta mapping user/process ke socket.
+Displays active connections, open ports, and user/process mappings for sockets.
 
 ### Audit Logs
-Menampilkan log dari:
+Displays logs from:
 - `sudo`
 - `systemd`
 - `sshd`
 
-## Catatan keamanan
+## Security notes
 
-- Aplikasi berjalan secara lokal pada `127.0.0.1` dan tidak mengikat ke semua interface secara default.
-- Session cookie menggunakan `HttpOnly`, `Secure`, dan `SameSite=Strict`.
-- Password disimpan dalam bentuk hash `scrypt` dengan salt unik per user.
-- TOTP secret disimpan di file `data/users.json` dan sebaiknya diproteksi dengan permission `0600`.
-- Jangan commit file `data/users.json` atau `data/INITIAL_CREDENTIALS.txt` ke repo publik jika itu berisi credential produksi.
+- The application binds to `127.0.0.1` by default rather than listening on all interfaces.
+- The session cookie uses `HttpOnly`, `Secure`, and `SameSite=Strict`.
+- Passwords are stored as `scrypt` hashes with a unique salt for each user.
+- TOTP secrets are stored in `data/users.json`; protect this file with `0600` permissions.
+- Do not commit `data/users.json` or `data/INITIAL_CREDENTIALS.txt` to a public repository if they contain production credentials.
 
 ## Troubleshooting
 
-### App tidak bisa login
-- Pastikan `users.json` ada di folder `data/`
-- Cek apakah `INITIAL_CREDENTIALS.txt` berisi password awal
-- Pastikan `NOC_SESSION_KEY` tidak berubah antar session jika anda ingin cookie tetap valid
+### Unable to log in
+- Make sure `users.json` exists in the `data/` directory.
+- Check whether `INITIAL_CREDENTIALS.txt` contains the initial password.
+- Keep `NOC_SESSION_KEY` consistent between sessions if you want session cookies to remain valid.
 
-### Endpoint `/api/noc` kosong atau error
-- Pastikan perangkat yang Anda monitor memang memiliki command seperti `systemctl`, `ss`, `journalctl`, `curl`
-- Pastikan service `sshd`, `nginx`, atau service lain yang ingin dipantau tersedia
-- Cek log terminal aplikasi untuk melihat stack trace
+### The `/api/noc` endpoint is empty or returns an error
+- Make sure the monitored system has utilities such as `systemctl`, `ss`, `journalctl`, and `curl`.
+- Make sure services such as `sshd`, `nginx`, or other services being monitored are available.
+- Check the application terminal output for a stack trace.
 
-### `Cannot find module` atau dependency error
+### `Cannot find module` or dependency errors
 
 ```bash
 npm install
 ```
 
-### Server tidak dapat dibuka di browser
-- Pastikan port `4000` tidak digunakan proses lain
-- Jalankan `node server.js` di terminal yang masih aktif
-- Cek `http://127.0.0.1:4000/api/session` di browser atau curl
+### The server cannot be opened in a browser
+- Make sure port `4000` is not being used by another process.
+- Run `node server.js` in a terminal that remains open.
+- Check `http://127.0.0.1:4000/api/session` in a browser or with `curl`.
 
 ```bash
 curl -i http://127.0.0.1:4000/api/session
 ```
 
-## Roadmap / pengembangan selanjutnya
+## Roadmap
 
-- Menambahkan dokumentasi API Swagger/OpenAPI
-- Menambahkan role-based access control (RBAC)
-- Menambahkan export log ke PDF/CSV
-- Menambahkan notifikasi alert via email/Telegram/Slack
-- Menambahkan user management di dashboard
-- Menambahkan cache dan optimasi query untuk data yang besar
+- Add Swagger/OpenAPI documentation
+- Add role-based access control (RBAC)
+- Add PDF/CSV log export
+- Add alert notifications via email, Telegram, or Slack
+- Add dashboard user management
+- Add caching and query optimizations for larger data sets
 
-## Lisensi
+## License
 
-Proyek ini menggunakan lisensi ISC yang tercantum dalam file `LICENSE`.
+This project is licensed under the ISC License, as specified in the `LICENSE` file.
 
-## Catatan
+## Note
 
-Dokumen ini dibuat untuk kebutuhan operasional dan dokumentasi internal. Jika Anda ingin mengembangkan lebih lanjut, disarankan menambahkan environment production yang terpisah dan menonaktifkan fitur debug pada deployment yang bersifat publik.
+This document is intended for operational and internal documentation. For further development, consider adding a separate production environment and disabling debug features in public deployments.
